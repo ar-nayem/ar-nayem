@@ -24,7 +24,6 @@ deploy — mostly Next.js + Prisma on a self-managed VPS.
 #### 📚 Education
 
 - **[HSK4 Practice](https://github.com/ar-nayem/hsk4-practice)** — offline Chinese exam practice app + Android build · [hsk.arnayem.top](https://hsk.arnayem.top)
-- **[Schedule → Calendar](https://github.com/ar-nayem/schedule)** — timetable screenshot to `.ics` file · [schedule.arnayem.top](https://schedule.arnayem.top)
 
 #### 🛠️ Infrastructure
 
