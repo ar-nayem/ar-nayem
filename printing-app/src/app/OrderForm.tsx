@@ -4,7 +4,14 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CURRENCY } from "@/lib/pricing";
 
-type Quote = { pages: number; pricePerPage: number; totalPrice: number; fileKind: string };
+type Quote = {
+  pages: number;
+  printPages: number;
+  pageRange: string | null;
+  pricePerPage: number;
+  totalPrice: number;
+  fileKind: string;
+};
 
 function money(amount: number) {
   return `${CURRENCY.symbol}${amount.toFixed(2)}`;
@@ -19,11 +26,14 @@ export default function OrderForm() {
   const [notes, setNotes] = useState("");
   const [copies, setCopies] = useState(1);
   const [color, setColor] = useState(false);
-  const [duplex, setDuplex] = useState(false);
+  const [duplex, setDuplex] = useState(true);
+  const [pageRange, setPageRange] = useState("");
 
   const [quote, setQuote] = useState<Quote | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<"quote" | "submit" | null>(null);
+
+  const isPdf = file?.type === "application/pdf";
 
   function buildFormData() {
     const fd = new FormData();
@@ -34,6 +44,7 @@ export default function OrderForm() {
     fd.set("copies", String(copies));
     fd.set("color", String(color));
     fd.set("duplex", String(duplex));
+    if (isPdf) fd.set("pageRange", pageRange);
     return fd;
   }
 
@@ -135,6 +146,25 @@ export default function OrderForm() {
         </div>
       </div>
 
+      {isPdf && (
+        <div>
+          <label className="block text-sm font-medium text-zinc-700 mb-2 dark:text-zinc-300" htmlFor="pageRange">
+            Pages to print (optional)
+          </label>
+          <input
+            id="pageRange"
+            type="text"
+            value={pageRange}
+            onChange={(e) => {
+              setPageRange(e.target.value);
+              resetQuoteIfStale();
+            }}
+            placeholder="e.g. 1-3, or leave blank for all pages"
+            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+          />
+        </div>
+      )}
+
       <div>
         <label className="block text-sm font-medium text-zinc-700 mb-2 dark:text-zinc-300" htmlFor="copies">
           Number of copies
@@ -167,6 +197,14 @@ export default function OrderForm() {
             <dd className="text-zinc-900 dark:text-zinc-100">{file?.name}</dd>
             <dt className="text-zinc-500 dark:text-zinc-400">Pages detected</dt>
             <dd className="text-zinc-900 dark:text-zinc-100">{quote.pages}</dd>
+            {quote.pageRange && (
+              <>
+                <dt className="text-zinc-500 dark:text-zinc-400">Printing pages</dt>
+                <dd className="text-zinc-900 dark:text-zinc-100">
+                  {quote.pageRange} ({quote.printPages} page{quote.printPages === 1 ? "" : "s"})
+                </dd>
+              </>
+            )}
             <dt className="text-zinc-500 dark:text-zinc-400">Sides</dt>
             <dd className="text-zinc-900 dark:text-zinc-100">
               {duplex ? "Double-sided" : "Single-sided"}
@@ -275,7 +313,7 @@ export default function OrderForm() {
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           rows={2}
-          placeholder="e.g. staple pages, A4 paper, print pages 1-3 only"
+          placeholder="e.g. staple pages, A4 paper"
           className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
         />
       </div>

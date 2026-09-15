@@ -40,7 +40,9 @@ export default async function OrderStatusPage({
             <dt className="text-zinc-500 dark:text-zinc-400">File</dt>
             <dd className="text-zinc-900 dark:text-zinc-50">{order.originalName}</dd>
             <dt className="text-zinc-500 dark:text-zinc-400">Pages</dt>
-            <dd className="text-zinc-900 dark:text-zinc-50">{order.pages}</dd>
+            <dd className="text-zinc-900 dark:text-zinc-50">
+              {order.pageRange ? `${order.pageRange} of ${order.pages}` : order.pages}
+            </dd>
             <dt className="text-zinc-500 dark:text-zinc-400">Sides</dt>
             <dd className="text-zinc-900 dark:text-zinc-50">{order.duplex ? "Double-sided" : "Single-sided"}</dd>
             <dt className="text-zinc-500 dark:text-zinc-400">Color</dt>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { PDFDocument } from "pdf-lib";
 import { prisma } from "@/lib/db";
 import { calculatePrice } from "@/lib/pricing";
+import { parsePageRange } from "@/lib/pageRange";
 import {
   ACCEPTED_MIME_TYPES,
   MAX_UPLOAD_BYTES,
@@ -67,7 +68,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "The uploaded file has no pages." }, { status: 400 });
   }
 
-  const { pricePerPage, totalPrice } = calculatePrice({ pages, copies, color, duplex });
+  const pageRangeRaw = fileKind === "pdf" ? String(formData.get("pageRange") ?? "") : "";
+  let selection;
+  try {
+    selection = parsePageRange(pageRangeRaw, pages);
+  } catch (err) {
+    return NextResponse.json({ error: err instanceof Error ? err.message : "Invalid page range." }, { status: 400 });
+  }
+
+  const { pricePerPage, totalPrice } = calculatePrice({
+    pages: selection.pages.length,
+    copies,
+    color,
+    duplex,
+  });
 
   const storedName = generateStoredName(file.type);
   await saveUpload(storedName, buffer);
@@ -83,6 +97,7 @@ export async function POST(request: NextRequest) {
       mimeType: file.type,
       fileSize: file.size,
       pages,
+      pageRange: selection.normalized,
       copies,
       color,
       duplex,
@@ -92,5 +107,5 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  return NextResponse.json({ id: order.id, pages, pricePerPage, totalPrice });
+  return NextResponse.json({ id: order.id, pages, pageRange: selection.normalized, pricePerPage, totalPrice });
 }

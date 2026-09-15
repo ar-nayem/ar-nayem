@@ -68,6 +68,7 @@ export default function OrdersTable({ initialOrders }: { initialOrders: Order[] 
       form.append("copies", String(order.copies));
       form.append("duplex", String(order.duplex));
       form.append("color", String(order.color));
+      if (order.pageRange) form.append("pageRange", order.pageRange);
 
       const printRes = await fetch(PRINT_AGENT_URL, { method: "POST", body: form });
       const data = await printRes.json();
@@ -145,7 +146,8 @@ export default function OrdersTable({ initialOrders }: { initialOrders: Order[] 
                 {order.originalName}
               </p>
               <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                {order.pages} pages · {order.duplex ? "Double-sided" : "Single-sided"} ·{" "}
+                {order.pageRange ? `Pages ${order.pageRange} of ${order.pages}` : `${order.pages} pages`} ·{" "}
+                {order.duplex ? "Double-sided" : "Single-sided"} ·{" "}
                 {order.color ? "Color" : "B&W"} · {order.copies}x copies ·{" "}
                 {formatDate(order.createdAt)}
               </p>

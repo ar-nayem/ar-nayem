@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PDFDocument } from "pdf-lib";
 import { calculatePrice } from "@/lib/pricing";
+import { parsePageRange } from "@/lib/pageRange";
 import { ACCEPTED_MIME_TYPES, MAX_UPLOAD_BYTES } from "@/lib/storage";
 
 // Computes pages + price for the options the customer picked, without
@@ -51,6 +52,28 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const { pricePerPage, totalPrice } = calculatePrice({ pages, copies, color, duplex });
-  return NextResponse.json({ pages, pricePerPage, totalPrice, fileKind });
+  // Page ranges only make sense for multi-page PDFs — a single image is
+  // always exactly one "page".
+  const pageRangeRaw = fileKind === "pdf" ? String(formData.get("pageRange") ?? "") : "";
+  let selection;
+  try {
+    selection = parsePageRange(pageRangeRaw, pages);
+  } catch (err) {
+    return NextResponse.json({ error: err instanceof Error ? err.message : "Invalid page range." }, { status: 400 });
+  }
+
+  const { pricePerPage, totalPrice } = calculatePrice({
+    pages: selection.pages.length,
+    copies,
+    color,
+    duplex,
+  });
+  return NextResponse.json({
+    pages,
+    printPages: selection.pages.length,
+    pageRange: selection.normalized,
+    pricePerPage,
+    totalPrice,
+    fileKind,
+  });
 }

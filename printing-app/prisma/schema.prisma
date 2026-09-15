@@ -24,10 +24,11 @@ model Order {
   mimeType     String
   fileSize     Int
 
-  pages  Int
-  copies Int
-  color  Boolean
-  duplex Boolean
+  pages     Int
+  pageRange String? // e.g. "1-3,5" — null/empty means all pages
+  copies    Int
+  color     Boolean
+  duplex    Boolean
 
   pricePerPage Float
   totalPrice   Float
