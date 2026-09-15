@@ -59,8 +59,8 @@ export default function OrdersTable({ initialOrders }: { initialOrders: Order[] 
             }}
             className={`rounded-full px-3 py-1 text-xs font-medium transition ${
               filter === s
-                ? "bg-zinc-900 text-white"
-                : "bg-white text-zinc-600 border border-zinc-300 hover:border-zinc-400"
+                ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
+                : "bg-white text-zinc-600 border border-zinc-300 hover:border-zinc-400 dark:bg-zinc-900 dark:text-zinc-400 dark:border-zinc-700 dark:hover:border-zinc-600"
             }`}
           >
             {s === "all" ? "All" : ORDER_STATUS_LABELS[s]}
@@ -68,44 +68,54 @@ export default function OrdersTable({ initialOrders }: { initialOrders: Order[] 
         ))}
       </div>
 
-      {loading && <p className="text-sm text-zinc-400">Loading…</p>}
+      {loading && <p className="text-sm text-zinc-400 dark:text-zinc-500">Loading…</p>}
 
       {!loading && orders.length === 0 && (
-        <p className="text-sm text-zinc-500">No orders here yet.</p>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">No orders here yet.</p>
       )}
 
       <div className="space-y-3">
         {orders.map((order) => (
           <div
             key={order.id}
-            className="rounded-xl border border-zinc-200 bg-white p-4 sm:flex sm:items-center sm:justify-between gap-4"
+            className="rounded-xl border border-zinc-200 bg-white p-4 sm:flex sm:items-center sm:justify-between gap-4 dark:border-zinc-800 dark:bg-zinc-900"
           >
             <div className="min-w-0 space-y-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-medium text-zinc-900">{order.customerName}</span>
-                <span className="text-xs text-zinc-400">{order.customerPhone}</span>
-                <span className="text-xs font-mono text-zinc-300">#{order.id.slice(0, 8)}</span>
+                <span className="font-medium text-zinc-900 dark:text-zinc-50">
+                  {order.customerName}
+                </span>
+                <span className="text-xs text-zinc-400 dark:text-zinc-500">
+                  {order.customerPhone}
+                </span>
+                <span className="text-xs font-mono text-zinc-300 dark:text-zinc-600">
+                  #{order.id.slice(0, 8)}
+                </span>
               </div>
-              <p className="text-sm text-zinc-600 truncate">{order.originalName}</p>
-              <p className="text-xs text-zinc-500">
+              <p className="text-sm text-zinc-600 truncate dark:text-zinc-400">
+                {order.originalName}
+              </p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 {order.pages} pages · {order.duplex ? "Double-sided" : "Single-sided"} ·{" "}
                 {order.color ? "Color" : "B&W"} · {order.copies}x copies ·{" "}
                 {formatDate(order.createdAt)}
               </p>
               {order.notes && (
-                <p className="text-xs text-zinc-500 italic">Note: {order.notes}</p>
+                <p className="text-xs text-zinc-500 italic dark:text-zinc-400">
+                  Note: {order.notes}
+                </p>
               )}
             </div>
 
             <div className="mt-3 sm:mt-0 flex items-center gap-3 shrink-0">
-              <span className="text-lg font-bold text-zinc-900">
+              <span className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
                 {formatMoney(order.totalPrice)}
               </span>
               <select
                 value={order.status}
                 disabled={updatingId === order.id}
                 onChange={(e) => handleStatusChange(order.id, e.target.value as OrderStatus)}
-                className="rounded-lg border border-zinc-300 px-2 py-1.5 text-sm disabled:opacity-50"
+                className="rounded-lg border border-zinc-300 px-2 py-1.5 text-sm disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
               >
                 {ORDER_STATUSES.map((s) => (
                   <option key={s} value={s}>
@@ -115,7 +125,7 @@ export default function OrdersTable({ initialOrders }: { initialOrders: Order[] 
               </select>
               <a
                 href={`/api/dashboard/orders/${order.id}/file`}
-                className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-800"
+                className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
               >
                 Download
               </a>

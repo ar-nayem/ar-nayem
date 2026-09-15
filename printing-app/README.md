@@ -11,22 +11,26 @@ No external services, no payment gateway — customers pay in person when they
 pick up their prints. Everything lives in one SQLite file plus a folder of
 uploaded files, so it deploys as a single Node process behind nginx.
 
-## 1. Set your real prices
+## 1. Prices
 
-Before you launch, edit **`src/lib/pricing.ts`**. Right now it has
-placeholder numbers:
+Set in **`src/lib/pricing.ts`**, from Nayem's printed price list:
 
 ```ts
 export const PRICE_PER_PAGE = {
-  bw: { single: 0.5, double: 0.4 },
-  color: { single: 2, double: 1.8 },
+  bw: { single: 0.1, double: 0.15 },
+  color: { single: 0.2, double: 0.3 },
 };
 ```
 
 Each number is the price **per printed side**, before multiplying by the
-number of copies. Change `CURRENCY` in the same file if you're not pricing
-in CNY. Nothing else in the app needs to change — every price shown to
-customers and stored on orders is computed from this one file.
+number of copies. Change `CURRENCY` in the same file if you ever need a
+different currency. Nothing else in the app needs to change — every price
+shown to customers and stored on orders is computed from this one file.
+
+**Not yet wired up:** "Picture Print (9 copies) — ¥4" from the price list.
+That's a flat-rate photo-sheet product (one photo, 9-up on a sheet), a
+different shape than "N pages at a per-page rate" — the order form only
+does the latter right now.
 
 ## 2. Local development (e.g. on your Mac)
 
@@ -58,7 +62,7 @@ wherever it was started from) — with a relative path they silently point
 at two different files and the app fails with "unable to open the
 database file". If you ever hand-edit `DATABASE_URL`, keep it absolute.
 
-## 3. Deploying to your VPS (printing.ar9.top)
+## 3. Deploying to your VPS (print.arnayem.top)
 
 This assumes the same pm2 + nginx setup you already use for your other
 projects.
@@ -79,12 +83,12 @@ pm2 start npm --name printing-app -- start -- -p 3000
 pm2 save
 ```
 
-**nginx** (`/etc/nginx/sites-available/printing.ar9.top`):
+**nginx** (`/etc/nginx/sites-available/print.arnayem.top`):
 
 ```nginx
 server {
     listen 80;
-    server_name printing.ar9.top;
+    server_name print.arnayem.top;
 
     location / {
         proxy_pass http://127.0.0.1:3000;
@@ -101,13 +105,13 @@ server {
 ```
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/printing.ar9.top /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/print.arnayem.top /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
-sudo certbot --nginx -d printing.ar9.top
+sudo certbot --nginx -d print.arnayem.top
 ```
 
 `/dashboard` needs no separate setup — it's just a route inside this same
-app, so `printing.ar9.top/dashboard` works automatically once the app is
+app, so `print.arnayem.top/dashboard` works automatically once the app is
 running.
 
 **Redeploying after code changes:**

@@ -12,7 +12,7 @@ deploy — mostly Next.js + Prisma on a self-managed VPS.
 
 #### 🖨️ Print shop
 
-- **[Printing Order Site](printing-app/)** — customers upload a PDF/photo, pick sides & color, get an instant quote, and confirm · [printing.ar9.top](https://printing.ar9.top) · dashboard at [printing.ar9.top/dashboard](https://printing.ar9.top/dashboard)
+- **[Printing Order Site](printing-app/)** — customers upload a PDF/photo, pick sides & color, get an instant quote, and confirm · [print.arnayem.top](https://print.arnayem.top) · dashboard at [print.arnayem.top/dashboard](https://print.arnayem.top/dashboard)
 
 #### 🎓 SaaS
 
