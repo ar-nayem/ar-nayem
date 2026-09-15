@@ -10,6 +10,10 @@ deploy — mostly Next.js + Prisma on a self-managed VPS.
 - **[ScanServe](https://github.com/ar-nayem/scanserve)** — QR code ordering & payment for restaurants
 - **[Marketia China](https://github.com/ar-nayem/marketiachina)** — e-commerce storefront & admin panel · [marketiachina.arnayem.top](https://marketiachina.arnayem.top)
 
+#### 🖨️ Print shop
+
+- **[Printing Order Site](printing-app/)** — customers upload a PDF/photo, pick sides & color, get an instant quote, and confirm · [printing.ar9.top](https://printing.ar9.top) · dashboard at [printing.ar9.top/dashboard](https://printing.ar9.top/dashboard)
+
 #### 🎓 SaaS
 
 - **[Student Portal](https://github.com/ar-nayem/student-portal)** — multi-tenant SaaS for study-abroad agencies · [portal.arnayem.top](https://portal.arnayem.top)

@@ -1,0 +1,43 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Order {
+  id String @id @default(cuid())
+
+  customerName  String
+  customerPhone String
+  notes         String?
+
+  originalName String
+  storedName   String
+  fileKind     String // "pdf" | "image"
+  mimeType     String
+  fileSize     Int
+
+  pages  Int
+  copies Int
+  color  Boolean
+  duplex Boolean
+
+  pricePerPage Float
+  totalPrice   Float
+
+  // "pending" | "printing" | "ready" | "completed" | "cancelled"
+  status String @default("pending")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
