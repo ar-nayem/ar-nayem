@@ -49,3 +49,18 @@ model Order {
   @@index([status])
   @@index([createdAt])
 }
+
+// Costs entered manually by the admin (paper, ink, maintenance, etc.) so
+// the finance tab can show real profit, not just order revenue.
+model Expense {
+  id String @id @default(cuid())
+
+  description String
+  category    String // "paper" | "ink" | "maintenance" | "other"
+  amount      Float
+  date        DateTime @default(now())
+
+  createdAt DateTime @default(now())
+
+  @@index([date])
+}
