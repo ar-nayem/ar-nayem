@@ -29,9 +29,16 @@ export default async function OrderStatusPage({
         <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white p-6 dark:bg-zinc-900 space-y-4">
           <div className="flex items-center justify-between">
             <span className="text-xs font-mono text-zinc-400">#{order.id}</span>
-            <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-              {statusLabel}
-            </span>
+            <div className="flex items-center gap-2">
+              {order.paid && (
+                <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700 dark:bg-green-900/40 dark:text-green-400">
+                  Paid
+                </span>
+              )}
+              <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                {statusLabel}
+              </span>
+            </div>
           </div>
 
           <dl className="grid grid-cols-2 gap-y-2 text-sm">
@@ -64,6 +71,42 @@ export default async function OrderStatusPage({
             </span>
           </div>
         </div>
+
+        {!order.paid && (
+          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white p-6 dark:bg-zinc-900 space-y-4">
+            <div className="text-center space-y-1">
+              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                Scan to pay {formatMoney(order.totalPrice)}
+              </h2>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                Or skip this and pay in cash when you pick up.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/pay/wechat-qr.png"
+                  alt="Scan with WeChat to pay"
+                  className="w-full rounded-lg border border-zinc-200 dark:border-zinc-800"
+                />
+                <p className="text-center text-xs text-zinc-500 dark:text-zinc-400">WeChat Pay</p>
+              </div>
+              <div className="space-y-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/pay/alipay-qr.png"
+                  alt="Scan with Alipay to pay"
+                  className="w-full rounded-lg border border-zinc-200 dark:border-zinc-800"
+                />
+                <p className="text-center text-xs text-zinc-500 dark:text-zinc-400">Alipay</p>
+              </div>
+            </div>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 text-center">
+              Mention order #{order.id.slice(0, 8)} in the payment note if you can.
+            </p>
+          </div>
+        )}
 
         <Link href="/" className="block text-center text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-100">
           Place another order

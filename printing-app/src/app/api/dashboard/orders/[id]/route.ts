@@ -24,14 +24,27 @@ export async function PATCH(request: NextRequest, ctx: RouteContext<"/api/dashbo
 
   const { id } = await ctx.params;
   const body = await request.json().catch(() => null);
-  const status = body?.status;
 
-  if (!isOrderStatus(status)) {
-    return NextResponse.json({ error: "Invalid status." }, { status: 400 });
+  const data: { status?: string; paid?: boolean; paidAt?: Date | null } = {};
+
+  if (body?.status !== undefined) {
+    if (!isOrderStatus(body.status)) {
+      return NextResponse.json({ error: "Invalid status." }, { status: 400 });
+    }
+    data.status = body.status;
+  }
+
+  if (body?.paid !== undefined) {
+    data.paid = Boolean(body.paid);
+    data.paidAt = data.paid ? new Date() : null;
+  }
+
+  if (Object.keys(data).length === 0) {
+    return NextResponse.json({ error: "Nothing to update." }, { status: 400 });
   }
 
   try {
-    const order = await prisma.order.update({ where: { id }, data: { status } });
+    const order = await prisma.order.update({ where: { id }, data });
     return NextResponse.json({ order });
   } catch {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });

@@ -55,6 +55,24 @@ export default function OrdersTable({ initialOrders }: { initialOrders: Order[] 
     }
   }
 
+  async function handleTogglePaid(id: string, paid: boolean) {
+    setUpdatingId(id);
+    const previous = orders;
+    setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, paid } : o)));
+    try {
+      const res = await fetch(`/api/dashboard/orders/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paid }),
+      });
+      if (!res.ok) setOrders(previous);
+    } catch {
+      setOrders(previous);
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
   async function handlePrint(order: Order) {
     setPrintState((prev) => ({ ...prev, [order.id]: { kind: "printing" } }));
     try {
@@ -162,6 +180,17 @@ export default function OrdersTable({ initialOrders }: { initialOrders: Order[] 
               <span className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
                 {formatMoney(order.totalPrice)}
               </span>
+              <button
+                onClick={() => handleTogglePaid(order.id, !order.paid)}
+                disabled={updatingId === order.id}
+                className={`rounded-lg px-3 py-1.5 text-sm font-medium disabled:opacity-50 ${
+                  order.paid
+                    ? "bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/40 dark:text-green-400 dark:hover:bg-green-900/60"
+                    : "border border-zinc-300 text-zinc-600 hover:border-zinc-400 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600"
+                }`}
+              >
+                {order.paid ? "✓ Paid" : "Mark paid"}
+              </button>
               <select
                 value={order.status}
                 disabled={updatingId === order.id}

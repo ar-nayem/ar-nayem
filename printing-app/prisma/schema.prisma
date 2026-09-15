@@ -36,6 +36,13 @@ model Order {
   // "pending" | "printing" | "ready" | "completed" | "cancelled"
   status String @default("pending")
 
+  // No payment API access (would need a Chinese business license) — admin
+  // sees the WeChat/Alipay QR on the confirmation page like the customer
+  // does, notices the payment notification on their own phone, and taps
+  // "Mark paid" in the dashboard. Manual, but free and license-free.
+  paid   Boolean   @default(false)
+  paidAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
