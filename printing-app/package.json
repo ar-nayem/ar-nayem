@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "postinstall": "prisma generate",
+    "setup": "node scripts/setup-dev-env.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
