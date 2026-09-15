@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: err instanceof Error ? err.message : "Invalid page range." }, { status: 400 });
   }
 
-  const { pricePerPage, totalPrice } = calculatePrice({
+  const result = calculatePrice({
     pages: selection.pages.length,
     copies,
     color,
@@ -100,12 +100,19 @@ export async function POST(request: NextRequest) {
       pageRange: selection.normalized,
       copies,
       color,
-      duplex,
-      pricePerPage,
-      totalPrice,
+      duplex: result.duplex,
+      pricePerPage: result.pricePerPage,
+      totalPrice: result.totalPrice,
       status: "pending",
     },
   });
 
-  return NextResponse.json({ id: order.id, pages, pageRange: selection.normalized, pricePerPage, totalPrice });
+  return NextResponse.json({
+    id: order.id,
+    pages,
+    pageRange: selection.normalized,
+    duplex: result.duplex,
+    pricePerPage: result.pricePerPage,
+    totalPrice: result.totalPrice,
+  });
 }

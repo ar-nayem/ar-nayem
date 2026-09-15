@@ -25,17 +25,25 @@ export function ratePerSheet(color: boolean, duplex: boolean): number {
   return PRICE_PER_UNIT[color ? "color" : "bw"][duplex ? "double" : "single"];
 }
 
+// A single page has only one side to print on — "double-sided" is
+// physically meaningless for a 1-page job, so it's always single-sided
+// regardless of what was requested.
+export function effectiveDuplex(pages: number, duplex: boolean): boolean {
+  return pages > 1 && duplex;
+}
+
 export function calculatePrice(options: {
   pages: number;
   copies: number;
   color: boolean;
   duplex: boolean;
-}): { pricePerPage: number; totalPrice: number } {
-  const rate = ratePerSheet(options.color, options.duplex);
-  const sheets = options.duplex ? Math.ceil(options.pages / 2) : options.pages;
+}): { pricePerPage: number; totalPrice: number; duplex: boolean } {
+  const duplex = effectiveDuplex(options.pages, options.duplex);
+  const rate = ratePerSheet(options.color, duplex);
+  const sheets = duplex ? Math.ceil(options.pages / 2) : options.pages;
   const raw = rate * sheets * options.copies;
   const totalPrice = Math.round(raw * 100) / 100;
-  return { pricePerPage: rate, totalPrice };
+  return { pricePerPage: rate, totalPrice, duplex };
 }
 
 export function formatMoney(amount: number): string {

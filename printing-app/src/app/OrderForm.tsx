@@ -10,6 +10,7 @@ type Quote = {
   pageRange: string | null;
   pricePerPage: number;
   totalPrice: number;
+  duplex: boolean;
   fileKind: string;
 };
 
@@ -32,6 +33,7 @@ export default function OrderForm() {
   const [quote, setQuote] = useState<Quote | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<"quote" | "submit" | null>(null);
+  const [paymentConfirmed, setPaymentConfirmed] = useState(false);
 
   const isPdf = file?.type === "application/pdf";
 
@@ -50,6 +52,7 @@ export default function OrderForm() {
 
   function resetQuoteIfStale() {
     if (quote) setQuote(null);
+    setPaymentConfirmed(false);
   }
 
   async function handleGetPrice(e: React.FormEvent) {
@@ -207,7 +210,7 @@ export default function OrderForm() {
             )}
             <dt className="text-zinc-500 dark:text-zinc-400">Sides</dt>
             <dd className="text-zinc-900 dark:text-zinc-100">
-              {duplex ? "Double-sided" : "Single-sided"}
+              {quote.duplex ? "Double-sided" : "Single-sided"}
             </dd>
             <dt className="text-zinc-500 dark:text-zinc-400">Color</dt>
             <dd className="text-zinc-900 dark:text-zinc-100">
@@ -217,15 +220,51 @@ export default function OrderForm() {
             <dd className="text-zinc-900 dark:text-zinc-100">{copies}</dd>
           </dl>
           <div className="border-t border-zinc-200 pt-4 flex items-baseline justify-between dark:border-zinc-800">
-            <span className="text-zinc-600 dark:text-zinc-400">Estimated total</span>
+            <span className="text-zinc-600 dark:text-zinc-400">Total to pay</span>
             <span className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
               {money(quote.totalPrice)}
             </span>
           </div>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            Pay in person when you pick up your prints. Final price is confirmed here — it will
-            not change unless the file itself is different from what we receive.
-          </p>
+        </div>
+
+        <div className="rounded-xl border border-zinc-200 bg-white p-6 space-y-4 dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="text-center space-y-1">
+            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+              Scan to pay {money(quote.totalPrice)}
+            </h2>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              Payment is required before the order is placed.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/pay/wechat-qr.png"
+                alt="Scan with WeChat to pay"
+                className="w-full rounded-lg border border-zinc-200 dark:border-zinc-800"
+              />
+              <p className="text-center text-xs text-zinc-500 dark:text-zinc-400">WeChat Pay</p>
+            </div>
+            <div className="space-y-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/pay/alipay-qr.png"
+                alt="Scan with Alipay to pay"
+                className="w-full rounded-lg border border-zinc-200 dark:border-zinc-800"
+              />
+              <p className="text-center text-xs text-zinc-500 dark:text-zinc-400">Alipay</p>
+            </div>
+          </div>
+          <label className="flex items-start gap-2 text-sm text-zinc-700 dark:text-zinc-300">
+            <input
+              type="checkbox"
+              checked={paymentConfirmed}
+              onChange={(e) => setPaymentConfirmed(e.target.checked)}
+              className="mt-0.5"
+            />
+            I have completed the payment via WeChat Pay or Alipay.
+          </label>
         </div>
 
         {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
@@ -242,7 +281,7 @@ export default function OrderForm() {
           <button
             type="button"
             onClick={handleConfirm}
-            disabled={busy !== null}
+            disabled={busy !== null || !paymentConfirmed}
             className="flex-1 rounded-lg bg-zinc-900 px-4 py-3 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
           >
             {busy === "submit" ? "Placing order…" : "Confirm & place order"}
