@@ -24,11 +24,16 @@ export async function GET(
     return NextResponse.json({ error: "File is missing on disk." }, { status: 410 });
   }
 
-  const safeName = order.originalName.replace(/["\r\n]/g, "_");
+  // HTTP header values must be Latin-1 — a customer filename with e.g.
+  // full-width punctuation or CJK characters would otherwise crash this
+  // route. Ship an ASCII fallback plus the real name via the standard
+  // filename* (RFC 5987) so browsers still show/save it correctly.
+  const asciiName = order.originalName.replace(/[^\x20-\x7E]/g, "_").replace(/["\r\n]/g, "_");
+  const encodedName = encodeURIComponent(order.originalName);
   return new NextResponse(new Uint8Array(buffer), {
     headers: {
       "Content-Type": order.mimeType,
-      "Content-Disposition": `attachment; filename="${safeName}"`,
+      "Content-Disposition": `attachment; filename="${asciiName}"; filename*=UTF-8''${encodedName}`,
       "Content-Length": String(buffer.byteLength),
     },
   });
