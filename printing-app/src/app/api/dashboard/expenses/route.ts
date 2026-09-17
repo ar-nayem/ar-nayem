@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { isAdminRequest } from "@/lib/auth";
-import { isExpenseCategory } from "@/lib/expenseCategory";
+import { isExpenseCategory, EXPENSE_CATEGORY_LABELS, type ExpenseCategory } from "@/lib/expenseCategory";
+import { pushFinanceEntry } from "@/lib/financeSync";
 
 export async function POST(request: NextRequest) {
   if (!(await isAdminRequest())) {
@@ -27,6 +28,15 @@ export async function POST(request: NextRequest) {
   const expense = await prisma.expense.create({
     data: { description, category, amount, date: dateRaw },
   });
+
+  void pushFinanceEntry({
+    op: "upsert",
+    externalId: `pa:expense:${expense.id}`,
+    type: "expense",
+    amount: expense.amount,
+    date: expense.date.toISOString(),
+    note: `${expense.description} (${EXPENSE_CATEGORY_LABELS[category as ExpenseCategory]})`,
+  }).catch(() => {});
 
   return NextResponse.json({ expense });
 }

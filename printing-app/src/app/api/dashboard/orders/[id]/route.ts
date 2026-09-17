@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { isAdminRequest } from "@/lib/auth";
 import { deleteUpload } from "@/lib/storage";
 import { isOrderStatus } from "@/lib/orderStatus";
+import { pushFinanceEntry } from "@/lib/financeSync";
 
 export async function GET(_request: NextRequest, ctx: RouteContext<"/api/dashboard/orders/[id]">) {
   if (!(await isAdminRequest())) {
@@ -45,6 +46,22 @@ export async function PATCH(request: NextRequest, ctx: RouteContext<"/api/dashbo
 
   try {
     const order = await prisma.order.update({ where: { id }, data });
+
+    if (data.paid !== undefined) {
+      const externalId = `pa:order:${order.id}`;
+      void (data.paid
+        ? pushFinanceEntry({
+            op: "upsert",
+            externalId,
+            type: "income",
+            amount: order.totalPrice,
+            date: (order.paidAt ?? new Date()).toISOString(),
+            note: `Order #${order.id.slice(0, 8)} — ${order.customerName}`,
+          })
+        : pushFinanceEntry({ op: "delete", externalId })
+      ).catch(() => {});
+    }
+
     return NextResponse.json({ order });
   } catch {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
