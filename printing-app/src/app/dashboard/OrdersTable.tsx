@@ -5,10 +5,13 @@ import type { Order } from "@/generated/prisma/client";
 import { formatMoney } from "@/lib/pricing";
 import { ORDER_STATUSES, ORDER_STATUS_LABELS, type OrderStatus } from "@/lib/orderStatus";
 
-// Local print agent running on the same Mac as the printer — see
-// print-agent/README.md. Loopback-only, so this only ever works when the
-// dashboard is open on that machine.
-const PRINT_AGENT_URL = "http://127.0.0.1:8877/print";
+// Local print agent running on the printer's Mac, reachable over HTTPS at
+// printer.arnayem.top (real cert, issued via DNS-01). That hostname
+// resolves to the Mac's AmneziaWG tunnel address for any VPN-connected
+// device (rewritten by a dnsmasq override on the VPN server) or to its
+// plain LAN IP for a non-VPN device on the same WiFi — either way this
+// works from a phone/tablet, not just the Mac's own browser.
+const PRINT_AGENT_URL = "https://printer.arnayem.top:8877/print";
 
 type PrintState = { kind: "printing" } | { kind: "success"; jobId: string } | { kind: "error"; message: string };
 
