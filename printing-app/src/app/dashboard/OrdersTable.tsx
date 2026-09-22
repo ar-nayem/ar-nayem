@@ -179,7 +179,7 @@ export default function OrdersTable({ initialOrders }: { initialOrders: Order[] 
               )}
             </div>
 
-            <div className="mt-3 sm:mt-0 flex items-center gap-3 shrink-0">
+            <div className="mt-3 sm:mt-0 flex flex-wrap items-center gap-3 shrink-0">
               <span className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
                 {formatMoney(order.totalPrice)}
               </span>
