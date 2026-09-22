@@ -16,7 +16,7 @@ export const ACCEPTED_MIME_TYPES: Record<string, "pdf" | "image"> = {
   "image/webp": "image",
 };
 
-export const MAX_UPLOAD_BYTES = 30 * 1024 * 1024; // 30MB
+export const MAX_UPLOAD_BYTES = 100 * 1024 * 1024; // 100MB
 
 function extensionFor(mimeType: string): string {
   switch (mimeType) {
